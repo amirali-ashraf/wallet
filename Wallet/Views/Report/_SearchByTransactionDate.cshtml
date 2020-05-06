@@ -1,0 +1,66 @@
+﻿@using Microsoft.Ajax.Utilities
+@using Wallet.Models.DBViewModels
+@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.ReportViewModel
+
+
+<fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+    <legend style="text-align: center">Search by Transaction Date</legend>
+    <label><input type="radio" name="optradio">Search by Transaction Date</label><br />
+    <label><input type="radio" name="optradio">Search by Adding Date</label>
+    <hr />
+    @*Transaction date control*@
+    @using (Html.BeginForm("ReportViewer", "Report", FormMethod.Post))
+    {
+
+
+        @Html.ValidationSummary()
+
+        @Html.Label("FromDate", "From Date")
+        @Html.TextBoxFor(x => x.Transaction.TransactionDate, new { @type = "date", @class = "form-control", @id = "FromDate", @name = "FromDate" })
+        @Html.ValidationMessageFor(x => x.Transaction.TransactionDate)<br />
+
+
+
+
+
+        @Html.Label("ToDate", "To Date")
+        @Html.TextBoxFor(x => x.Transaction.TransactionDate, new { @type = "date", @class = "form-control", @id = "ToDate", @name = "ToDate" })
+        @Html.ValidationMessageFor(x => x.Transaction.TransactionDate)<br />
+
+
+
+
+
+        <label for="Types">Type</label>
+        <select id="Types" class="form-control">
+            <option value="">All Types</option>
+            <option value="1">Income</option>
+            <option value="2">Expenditure</option>
+        </select><br />
+
+        <label for="Categories">Categories</label>
+        <select class="form-control" id="Categories"></select>
+
+        @*@Html.LabelFor(m => m.Categories)
+            @Html.DropDownListFor(m => m.Categories,
+                                        new SelectList(Model.Categories.Where(c => c.TypeOfCategory == Category.Type.Expenditure), "Id", "Name"),
+                                        "All Categories",
+                                        new { @class = "form-control", @id = "Categories" })*@
+        <br />
+        <label for="Subcategories">Subcategories</label>
+        <select class="form-control" id="Subcategories"></select>
+
+
+        @Html.AntiForgeryToken()
+        <button id="Reporting" value="Search" style="margin-top: 10px" class="btn btn-primary">Reporting</button>
+
+
+        <br />
+        
+
+    }
+
+</fieldset>
+
+

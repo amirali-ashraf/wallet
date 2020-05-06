@@ -1,0 +1,330 @@
+﻿
+
+@using Wallet.Models.DBViewModels
+@using Wallet.Models.WalletModels
+
+@model CategoriesManagementViewModel
+
+@{
+    ViewBag.Title = "Groups";
+}
+
+<br />
+<h1 style="margin:30px">Categories and Subcategories Manager</h1>
+<div>
+    <div class="row" accesskeyid="CatrgoriesList">
+        <div class="col-md-6">
+            @Html.Partial("_IncomeList")
+        </div>
+
+        <div class="col-md-6">
+            @Html.Partial("_ExpenditureList")
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+@*<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+        Launch demo modal
+    </button>*@
+
+<!-- Modal for Categories -->
+<div class="modal fade" id="modal-category" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#0094ff">
+                <h5 class="modal-title" id="exampleModalLongTitle" style="color:white">Categories Management</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Type:&nbsp;<h3 id="category-typeName"></h3> </p><br />
+                <form class="form-group">
+                    <label>Name</label>
+                    <input id="categoryName" class="form-control" />
+                    <label>Choose a Color</label>
+                    <input type="color" class="form-control" style="width: 50px; height: 40px" />
+                    <br />
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="save-category" type="button" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*Modal For Subcategories*@
+
+<div class="modal fade" id="modal-subcategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#0094ff">
+                <h5 class="modal-title" id="subcategoriesManagement" style="color:white">Subcategories Management</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-group">
+                    <p>Type:&nbsp;<h3 id="subcategory-typeName"></h3> </p><br />
+                    <p>Category:&nbsp; <h3 id="subcategory-categoryName"></h3></p><br />
+                    <label>Name</label>
+                    <input id="subcategoryName" class="form-control" />
+                    <label>Choose a Color</label>
+                    <input type="color" class="form-control" style="width: 50px; height: 40px" />
+                    <br />
+                    @*<input id="hidden-data" class="form-control" type="hidden" value="0">*@
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="save-subcategory" type="button" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+
+        var subcategoryId;
+        var categoryId;
+        var typeId;
+        $("button[id='add-subcategory']").on("click",
+            function () {
+                var buttonSubcategory = $(this);
+                subcategoryId = buttonSubcategory.attr("subcategory-id");
+                categoryId = buttonSubcategory.attr("category-id");
+                var modal = $("div[id='modal-subcategory'").modal();
+                modal.find(".modal-body #subcategory-typeName").text(buttonSubcategory.attr("type-name"));
+                modal.find(".modal-body #subcategory-categoryName").text(buttonSubcategory.attr("category-name"));
+                modal.find(".modal-body #subcategoryName").val("");
+            });
+
+        $("button[id='edit-subcategory']").on("click",
+            function () {
+                var buttonSubcategory = $(this);
+                subcategoryId = buttonSubcategory.attr("subcategory-id");
+                categoryId = buttonSubcategory.attr("category-id");
+                var modal = $("div[id='modal-subcategory'").modal();
+                modal.find(".modal-body #subcategory-typeName").text(buttonSubcategory.attr("type-name"));
+                modal.find(".modal-body #subcategory-categoryName").text(buttonSubcategory.attr("category-name"));
+                modal.find(".modal-body #subcategoryName").val(buttonSubcategory.attr("subcategory-name"));
+            });
+
+        $("button[id='save-subcategory']").on("click",
+            function () {
+                var subcategoryName = $("#subcategoryName").val();
+                var subcategoryColor = "#111111";
+                if (parseInt(subcategoryId) === -1) {
+                    $.ajax({
+                        url: "CreateSubcategory",
+                        type: "POST",
+                        data: {
+                            categoryId:
+                                categoryId,
+                            subcategoryName:
+                                subcategoryName,
+                            subcategoryColor:
+                                subcategoryColor
+                        }
+                    }).done(function () {
+                        alert("The new subcategory is added.");
+                        location.reload();
+
+                    }).fail(function () {
+                        alert("Something went wrong!");
+                        location.reload();
+                    });
+                } else if (parseInt(subcategoryId) > 0) {
+                    $.ajax({
+                        url: "EditSubcategory",
+                        type: "POST",
+                        data: {
+                            subcategoryId:
+                                subcategoryId,
+                            subcategoryNewName:
+                                subcategoryName,
+                            subcategoryNewColor:
+                                subcategoryColor
+                        }
+                    }).done(function () {
+                        alert("The subcategory is edited.");
+                        location.reload();
+
+                    }).fail(function () {
+                        alert("Something went wrong!");
+                        location.reload();
+                    });
+                }
+            });
+
+
+        //delete subcategory
+        $("button[id='delete-subcategory']").on("click",
+            function () {
+                subcategoryId = $(this).attr("subcategory-id");
+                alert(subcategoryId);
+                bootbox.confirm({
+                    message: "Do you really want to delete the subcategory?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result === true) {
+                            $.ajax({
+                                url: "DeleteSubcategory",
+                                type: "Delete",
+                                data: {
+                                    subcategoryId:
+                                        subcategoryId
+                                }
+                            }).done(function () {
+                                alert("The subcategory is deleted.");
+                                location.reload();
+
+                            }).fail(function () {
+                                alert("Something went wrong!");
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+
+            });
+
+
+        //Add or Edit Categories
+        $("button[id='add-category']").on("click",
+            function () {
+                var buttonCategory = $(this);
+                categoryId = buttonCategory.attr("category-id");
+                typeId = buttonCategory.attr("type-id");
+                var modal = $("div[id='modal-category'").modal();
+                modal.find(".modal-body #category-typeName").text(buttonCategory.attr("category-type"));
+                modal.find(".modal-body #categoryName").val(buttonCategory.attr(""));
+
+            });
+
+       
+
+
+        $("button[id='edit-category']").on("click",
+            function () {
+                var buttonCategory = $(this);
+                categoryId = buttonCategory.attr("category-id");
+                var modal = $("div[id='modal-category'").modal();
+                modal.find(".modal-body #category-typeName").text(buttonCategory.attr("category-type"));
+                modal.find(".modal-body #categoryName").val(buttonCategory.attr("category-name"));
+            });
+        $("button[id='save-category']").on("click",
+            function () {
+                var categoryName = $("#categoryName").val();
+                var categoryColor = "#111111";
+                if (parseInt(categoryId) === -1) {
+                    $.ajax({
+                        url: "CreateCategory",
+                        type: "POST",
+                        data: {
+                            typeId:
+                                parseInt(typeId),
+                            categoryName:
+                                categoryName,
+                            categoryColor:
+                                categoryColor
+                        }
+                    }).done(function () {
+                        alert("The new category is added.");
+                        location.reload();
+
+                    }).fail(function () {
+                        alert("Something went wrong!");
+                        location.reload();
+                    });
+                } else if (parseInt(categoryId) > 0) {
+                    $.ajax({
+                        url: "EditCategory",
+                        type: "PUT",
+                        data: {
+                            categoryId:
+                                categoryId,
+                            categoryNewName:
+                                categoryName,
+                            categoryNewColor:
+                                categoryColor
+                        }
+                    }).done(function () {
+                        alert("The category is edited.");
+                        location.reload();
+
+                    }).fail(function () {
+                        alert("Something went wrong!");
+                        location.reload();
+                    });
+                }
+            });
+
+        $("button[id='remove-category']").on("click",
+            function () {
+                categoryId = $(this).attr("category-id");
+                alert(categoryId);
+                bootbox.confirm({
+                    message: "Do you really want to delete the subcategory?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result === true) {
+                            $.ajax({
+                                url: "DeleteCategory",
+                                type: "Delete",
+                                data: {
+                                    categoryId:
+                                        categoryId
+                                }
+                            }).done(function () {
+                                alert("The subcategory is deleted.");
+                                location.reload();
+
+                            }).fail(function () {
+                                alert("Something went wrong! It may dependant on another element...");
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+
+            });
+
+    </script>
+}

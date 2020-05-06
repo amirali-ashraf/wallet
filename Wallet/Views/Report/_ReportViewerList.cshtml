@@ -1,0 +1,60 @@
+﻿
+@using Wallet.Models.DBViewModels
+@using Wallet.Models.WalletModels
+
+@model ReportViewModel
+@{
+    int a = 1;
+}
+
+<fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+    <legend style="text-align: center">Table List Report</legend>
+    @if (Model.Transactions.Count == 0)
+    {
+        <h2 class="text-center" style="color:#ff0000">No Data is Available to Preview</h2>
+    }
+    else if (Model.Transactions.Count > 0)
+    {
+        <table id="ReportList" class="table table-bordered table-hover text-center">
+            <thead>
+                <tr style="font-weight: bold;background-color: #0094ff">
+                    <th>Row</th>
+                    <th>Category</th>
+                    <th>Subcategory</th>
+                    <th>Value</th>
+                    <th>Comment</th>
+                    <th>Transaction Date</th>
+                    <th>Edit/Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Transactions)
+                {
+                    <tr>
+                        <td>@(a++)</td>
+                        <td>@item.Category.Name</td>
+                        <td>@item.Subcategory.Name</td>
+                        @if (item.Category.TypeOfCategory == Category.Type.Income)
+                        {
+                            <td style="color:green"><span class="fa fa-arrow-circle-o-up"></span>@item.TransationValue.ToString("0,0")</td>
+                        }
+                        else if (item.Category.TypeOfCategory == Category.Type.Expenditure)
+                        {
+                            <td style="color:orangered"><span class="fa fa-arrow-circle-o-down"></span>@item.TransationValue.ToString("0,0")</td>
+
+                        }
+                        <td><button class="btn btn-link">Comment</button></td>
+                        <td>@item.TransactionDate.Date.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <button class="btn btn-link">Edit</button>
+                            <button class="btn btn-link">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+
+</fieldset>>
+

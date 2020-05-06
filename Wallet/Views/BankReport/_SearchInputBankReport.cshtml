@@ -1,0 +1,31 @@
+﻿@model Wallet.Models.DBViewModels.BankReportViewModel
+
+@using (@Html.BeginForm("BankReportByName", "BankReport", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.LabelFor(m => m.BankId);
+
+    @Html.DropDownListFor(m => m.BankId,
+             new SelectList(Model.WalletAndBanks, "Id", "Name"),
+             "--Select the Bank--",
+             new { @class = "form-control", @id = "select-bank" })
+    @Html.ValidationMessageFor(m => m.BankId, "Choose a bank from list.")
+
+    <br />
+
+    @Html.LabelFor(m => m.FromDate);
+    @Html.TextBoxFor(m => m.FromDate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", @id = "from-date", @name = "fromDate" })
+    @Html.ValidationMessageFor(m => m.FromDate, "Insert the start date.")
+    <br />
+
+    @Html.LabelFor(m => m.ToDate);
+    @Html.TextBoxFor(m => m.ToDate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", @id = "from-date", @name = "fromDate" })
+    @Html.ValidationMessageFor(m => m.ToDate, "Insert the last date.")
+    <br />
+
+
+
+    @*<input class="form-control" name="bankId" />*@
+    <br />
+    <button class="btn btn-warning btn-sm">Get Report</button>
+
+}

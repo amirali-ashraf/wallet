@@ -1,0 +1,164 @@
+﻿
+@{
+    ViewBag.Title = "Wallet and Banks Configuration";
+}
+
+
+
+
+@model Wallet.Models.DBViewModels.WalletAndBanksViewModel
+<br />
+
+<h2>Configure Your Wallet and Banks</h2>
+<br />
+
+
+
+<div class="container">
+
+
+    <div class="row">
+        <div class="col-md-4">
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                @*todo add a border to this field*@
+                <legend style="text-align: center">Add New Wallet/Bank</legend>
+                @using (Html.BeginForm("AddNewWalletAndBank", "WalletAndBanks", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+
+                    <div class="form-group">
+                        <label for="walletAndBanksName">Add a new wallet or bank</label>
+                        <input id="walletAndBanksName" name="Name" class="form-control" />
+
+                        <label for="setInitialValue">Set the intial value</label>
+                        <input id="setInitialValue" name="InitialValue" class="form-control" />
+                    </div>
+                    <button class="btn btn-primary">Submit</button>
+
+                }
+            </fieldset>
+        </div>
+        <div class="col-md-8">
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                @*todo add a border to this field*@
+                <legend style="text-align: center">List of Your Wallet and Banks</legend>
+                @if (Model.WalletAndBanks.Count == 0)
+                {
+                    <h3 class="text-center" style="color:#ff006e">No Bank or Wallet is Available</h3>
+                }
+                else
+                {
+                    <table id="Wallet" class="table table-bordered table-hover">
+                        <thead style="background-color: #0094ff">
+                            <tr class="text-center">
+                                <th>Name</th>
+                                <th>Initial Value</th>
+                                <th>Current Value</th>
+                                <th>Delete</th>
+                                <th>Edit this Field</th>
+                            </tr>
+                        </thead>
+
+                        @foreach (var item in Model.WalletAndBanks)
+                        {
+
+                            <tr style="list-style-type: none">
+
+
+                                <td>@item.Name</td>
+                                <td>@item.InitialValue</td>
+                                <td>@item.BalanceValue</td>
+                                <td>
+                                    @using (Html.BeginForm("DeleteWalletAndBank", "WalletAndBanks", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                                    {
+                                        @*todo: use json instead of form submiting*@
+                                        <form>
+
+                                            <input type="hidden" name="id" value="@item.Id" />
+
+                                            <button class="btn btn-danger">
+                                                <span class="fa fa-remove"></span>
+                                                Delete
+                                            </button>
+                                        </form>
+
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning" id="edit-wallet" item-id="@item.Id">
+                                        <span class="fa fa-list"></span> Edit Wallet
+                                    </button>
+                                    <div id="edit-item" is-hidden="true" item-id="@item.Id">
+
+                                        @using (Html.BeginForm("EditWalletAndBank", "WalletAndBanks", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                                        {
+
+                                            @*todo add the action here*@
+                                            <div class="form-group">
+                                                <hr />
+                                                <label for="walletAndBanksName-@item.Id">Change Name</label>
+                                                <input id="walletAndBanksName-@item.Id" name="Name" class="form-control text-center" value="@item.Name" />
+
+                                                @*todo something about the initial value edit*@
+                                                @*<label for="setInitialValue">Set the intial value</label>
+                                                    <input id="setInitialValue" name="InitialValue" class="form-control"/>*@
+                                            </div>
+                                            <input type="hidden" value="@item.Id" name="Id" />
+                                            <button class="btn btn-primary">Apply Changes</button>
+
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+
+                            @*<li style="list-style-type: none">
+                                    <span class="fa fa-money" style="color: green; font-size: 20px; font-weight: bold"></span> @item.Name
+                                    ==> @item.InitialValue ==>@item.BalanceValue
+                                </li>*@
+
+                        }
+                    </table>
+                }
+            </fieldset>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+
+
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $("div#add-new-item").hide();
+            $("div#edit-item").hide();
+
+        });
+        $("button[id='add-wallet']").on("click",
+            function () {
+
+                var click = $(this);
+                var status = $("div#add-new-item").attr("is-hidden");
+                (status === "false") ? $("div#add-new-item").attr("is-hidden", "true").slideUp() : $("div#add-new-item").attr("is-hidden", "false").slideDown();
+
+            });
+
+        $("button[id='edit-wallet']").on("click",
+            function () {
+
+                var click = $(this);
+                var clickId = click.attr("item-id");
+                var selectedDiv = "div#edit-item[item-id='" + clickId + "']";
+                var status = $(selectedDiv).attr("is-hidden");
+                (status === "false") ? $(selectedDiv).attr("is-hidden", "true").slideUp() : $(selectedDiv).attr("is-hidden", "false").slideDown();
+
+            });
+
+    </script>
+}

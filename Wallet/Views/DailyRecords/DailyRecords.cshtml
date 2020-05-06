@@ -1,0 +1,502 @@
+﻿@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.AddRecordViewModel
+
+@{
+    ViewBag.Title = "Add a New Transaction";
+}
+
+<div class="container">
+    <br />
+    <h2>Add a New Transaction</h2>
+
+</div>
+
+<div class="container">
+    <br />
+
+    <div class="row">
+        <div class="col-md-4">
+            <fieldset class="border " style="border-color: gray; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Add New Transaction</legend>
+                @Html.Partial("_NewTransaction", Model)
+            </fieldset>
+        </div>
+        <div class="col-md-8">
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Today Added Transactions</legend>
+                <div id="listOfRecords">
+                    @Html.Partial("_NumericalAndChartField", Model)
+                </div>
+            </fieldset>
+            <br />
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Today's Transactions</legend>
+                <div id="listOfRecords">
+                    @Html.Partial("_TodayTransactions", Model)
+                </div>
+            </fieldset>
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+
+
+
+    <script>
+
+
+
+        $("div").on("click","div[class*='btn-sm']",function() {
+            var selectedBtn = $(this);
+            $("div[class*='btn-lg active']").addClass("btn-sm").removeClass("btn-lg active");
+            $(selectedBtn).addClass("btn-lg active").removeClass("btn-sm");
+        });
+
+
+
+
+        //Transaction Value Currency Formatter
+        $("input[id='transaction-value']").keyup(function () {
+            var transactionValue = $(this).val();
+            var newValue = numeral(transactionValue).format('0,0');
+            $("p[id='transaction-value']").text("Transaction Value: \n " + newValue);
+        });
+
+        //this Script shows the result of changing of the action of radio button
+        //which will cause to change the category
+        $('input[type=radio]').change(function () {
+            var catId = $('select[name=SubCat]');
+            var type = $(this).val();
+            $.post("TypeChange", { type: type })
+                .done(function (data) {
+                    var subCatId = $('#subCategoryList'); //make changes in Subcategory
+                    subCatId.children('option').remove(); //
+                    subCatId.append(//
+                        $('<option></option>').val(-1).html("--Select a Subcategory--") //
+                    );
+                    var catId = $('#form-group-select'); //make changes in category
+                    catId.children('option').remove(); //
+                    catId.append(//
+                        $('<option></option>').val(-1).html("--Select a Category--") //
+                    );
+                    $.each(data,
+                        function (val, data) {
+                            catId.append(
+                                $('<option></option>').val(data.Id).html(data.name)
+                            );
+                        });
+                });
+        });
+
+        //this Script shows the result of changing of the action of radio button
+        //which will cause to change the category
+
+        // This Code works only on NewTransaciton PartialView
+        $('div[id="category-type"]').click(function () {
+            var catId = $('select[name=SubCat]');
+            var type = $(this).text();
+            $.post("TypeChange", { type: type })
+                .done(function (data) {
+
+                    var subCatId = $('select[id="select-subcategory"]'); //make changes in Subcategory
+                    subCatId.children('option').remove(); //
+                    subCatId.append(//
+                        $('<option></option>').val("").html("--Select a Subcategory--") //
+                    );
+                    var catId = $('select[id="select-category"]'); //make changes in category
+                    catId.children('option').remove(); //
+                    catId.append(//
+                        $('<option></option>').val("").html("--Select a Category--") //
+                    );
+                    $.each(data,
+                        function (val, data) {
+                            catId.append(
+                                $('<option></option>').val(data.Id).html(data.name)
+                            );
+                        });
+                });
+        });
+
+        //this code works with the NewTransaction PartialView
+        $('select[id="select-category"]').on('change',
+            function () {
+                var catSelected = $("option:selected", this);
+                var valueSelected = this.value;
+
+                $.post("CategoryChange", { catId: valueSelected }).done(function (data) {
+                    var subCatId = $('select[id="select-subcategory"]');
+                    subCatId.children('option').remove();
+                    subCatId.append(
+                        $('<option></option>').val("").html("--Select a Subcategory--")
+                    );
+                    $.each(data,
+                        function (val, data) {
+
+                            subCatId.append(
+                                $('<option></option>').val(data.Id).html(data.name)
+                            );
+                        });
+                });
+            });
+
+        // this function causes the changes in the subcategory menu by changing the category
+        $('select[name=Category]').on('change',
+            function () {
+                var catSelected = $("option:selected", this);
+                var valueSelected = this.value;
+
+                $.post("CategoryChange", { catId: valueSelected }).done(function (data) {
+                    var subCatId = $('#subCategoryList');
+                    subCatId.children('option').remove();
+                    subCatId.append(
+                        $('<option></option>').val(-1).html("--Select a Subcategory--")
+                    );
+                    $.each(data,
+                        function (val, data) {
+
+                            subCatId.append(
+                                $('<option></option>').val(data.Id).html(data.name)
+                            );
+                        });
+                });
+            });
+
+        // because of using the json as a faster way to save the data in the database I prevent the event
+        // from sending the post.
+
+
+
+
+        // Save a new record by sending a json post.
+        $('button[name="saveNewRecord"]').on('click',
+            function () {
+                var todayTarnsactions = $('table[Id="todayTarnsactions"]');
+                var transactionDate = $("#transactionDate").val();
+                var categoryType = $('input[type=radio]').val();
+                var selectedCategory = $("#form-group-select").val();
+                var selectedSubcategory = $("#subCategoryList").val();
+                var transactionValue = $('#value').val();
+                var walletAndBanks = $('#walletAndBanks').val();
+                var transactionComment = $('#transactionComment').val();
+                $.post("AddNewRecord",
+                    {
+                        selectedCategory: selectedCategory,
+                        transactionDate: transactionDate,
+                        selectedSubcategory: selectedSubcategory,
+                        transactionValue: transactionValue,
+                        walletAndBanks: walletAndBanks,
+                        transactionComment: transactionComment
+                    }
+                )
+                    .done(function (data) {
+                        if (data === true) {
+                            alert("The new record is added.");
+                            ItemsList();
+                        } else {
+                            alert("The new record is not added.");
+                        }
+
+                    });
+            });
+
+
+        // this function procides the list of daily records which get them from the json controller
+        function ItemsList() {
+
+            var todayTarnsactions = $('#todayTarnsactions > tbody');
+            todayTarnsactions.empty();
+            $.post("ListRecords")
+                .done(function (data) {
+                    var todayTarnsactions = $("#todayTarnsactions > tbody");
+                    $.each(data,
+                        function (val, data) {
+                            todayTarnsactions.append('<tr id="' +
+                                data.transactionId +
+                                '" class="text-center clickable-row" data-href="#">' +
+                                '<td>' +
+                                data.typeOfTransaction +
+                                '</td>' +
+                                '<td>' +
+                                data.categoryName +
+                                '</td>' +
+                                '<td>' +
+                                data.subcategoryName +
+                                '</td>' +
+                                '<td>' +
+                                addCommas(data.value) +
+                                '</td>' +
+                                '<td>' +
+                                '<button id="' +
+                                data.transactionId +
+                                '" name="delete" class="btn btn-danger" style="margin-left:10px" title="Remove the Record"><span class="fa fa-remove" style="font-weight:bold"></span></button>' +
+                                '</td>' +
+                                '</tr >');
+                        });
+                });
+        }
+
+
+        //Showing the list of today's records as soon as the page opens
+        $(document).ready(function () {
+            ItemsList();
+
+
+            // todo: add the data to the dataTable
+            //$('#TodayTransactions').DataTable();
+
+
+            var dataTransactionValues = [];
+            var dataTransactionCategory = [];
+
+            @foreach (var value in Model.Transactions.GroupBy(t=>t.Category.TypeOfCategory)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataTransactionValues.push(parseInt("@value.Value"));
+                @:dataTransactionCategory.push("@value.CategoryType");
+
+            }
+            //chartsssssss
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+
+
+
+            var dataIncomeTransactionValues = [];
+            var dataIncomeTransactionCategory = [];
+
+
+            var incomeChartDraw = document.getElementById("incomeChart").getContext('2d');
+            @foreach (var value in Model.Transactions.Where(t => t.Category.TypeOfCategory == Category.Type.Income)
+                                                     .GroupBy(t=>t.Category)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataIncomeTransactionValues.push(parseInt("@value.Value"));
+                @:dataIncomeTransactionCategory.push("@value.Name");
+
+            }
+            var incomeChart = new Chart(incomeChartDraw,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataIncomeTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataIncomeTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+
+
+
+            var dataExpenditureTransactionValues = [];
+            var dataExpenditureTransactionCategory = [];
+
+            var expenditureChartDraw = document.getElementById("expenditureChart").getContext('2d');
+            @foreach (var value in Model.Transactions.Where(t => t.Category.TypeOfCategory == Category.Type.Expenditure)
+                                                     .GroupBy(t=>t.Category)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataExpenditureTransactionValues.push(parseInt("@value.Value"));
+                @:dataExpenditureTransactionCategory.push("@value.Name");
+
+            }
+            var expenditureChart = new Chart(expenditureChartDraw,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataExpenditureTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataExpenditureTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+
+
+
+        });
+
+
+        //delete button acts here as it is clicked in the table. due to its creating as a jquery function, I should use the
+        //delegate method to make the button functionable
+        $('table').delegate('button[name*="delete"]',
+            'click',
+            function () {
+                var idToDelete = this.id;                
+                $.post("RemoveRecord",
+                    {
+                        id: this.id
+                    }).done(
+                    function (data) {
+                        if (data === true) {
+                            $("tr[id='" + idToDelete + "']").remove().slideUp();
+                            alert("This transaction is deleted");
+                        }
+                    });
+            });
+
+        // this method is used to have a numeric seperation in the list of records like 1,000,000
+        //function addCommas(nStr) {
+        //    nStr += '';
+        //    var x = nStr.split('.');
+        //    var x1 = x[0];
+        //    var x2 = x.length > 1 ? '.' + x[1] : '';
+        //    var rgx = /(\d+)(\d{3})/;
+        //    while (rgx.test(x1)) {
+        //        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        //    }
+        //    return (x1 + x2);
+        //}
+
+    </script>
+    <script>
+
+                // test scripts
+
+
+        ////this is a test code to create a button by using the jquery to create a button and then make it functionable
+
+        //$(document).ready(function () {
+        //    $("body").append(
+        //        "</br><button id='delete'>aaaa</button>"
+        //    );
+        //});
+
+        //$("body").delegate('button[id="delete"]', 'click',
+        //    function () {
+        //        alert("hi");
+        //    });
+
+
+        @*$('input[type=radio]').change(function () {
+        var catId = $('select[name=SubCat]');
+        var typeId = $(this).val();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("TypeChange", "DailyRecords")',
+            data: { typeId: typeId },
+            datatype: "json",
+            success: function (data) {
+                var subCatId = $('#subCategoryList'); //make changes in suncategory
+                subCatId.children('option').remove(); //
+                subCatId.append( //
+                    $('<option></option>').val(-1).html("--Select a Subcategory--") //
+                );
+                var catId = $('#form-group-select'); //make changes in category
+                catId.children('option').remove(); //
+                catId.append( //
+                    $('<option></option>').val(-1).html("--Select a Category--") //
+                );
+                $.each(data, function (val, data) {
+                    catId.append(
+                        $('<option></option>').val(data.Id).html(data.name)
+                    );
+                });
+            },
+
+        })
+    });*@
+
+
+
+
+
+    </script>
+}

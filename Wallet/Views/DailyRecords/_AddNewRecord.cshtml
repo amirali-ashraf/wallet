@@ -1,0 +1,60 @@
+﻿@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.AddRecordViewModel
+
+
+@using (Html.BeginForm(FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="text-center">                  
+                    <br />
+                    <label class="control-label">Transaction Date</label>
+                    @*In this place I should optimize the placeholder view*@
+                    @Html.TextBoxFor(x => x.Transaction.TransactionDate, new { @type = "date", @id = "transactionDate", @class = "form-control text-center" })
+                    @Html.ValidationMessageFor(x => x.Transaction.TransactionDate)
+                    @*<input type="date"  id="transactionDate" class="form-control text-center" value="@DateTime.Now.ToShortDateString()" />*@
+                    <br />
+                    <label class="radio-inline" for="Expenditure">
+                        <input type="radio" id="Expenditure" name="Rbutton" value="@Category.Type.Expenditure" checked>Expenditure<span>@*add gyph*@</span>
+                    </label>
+                    &nbsp;
+                    <label class="radio-inline" for="Income">
+                        <input type="radio" id="Income" class="active" name="Rbutton" value="@Category.Type.Income">Income<span>@*add gyph*@</span>
+                    </label>
+
+                </div>
+                <br />
+                <label class="control-label" for="form-group-select">Category</label>
+                <select class="form-control text-center" id="form-group-select" name="Category">
+                    <option value="-1">--Select a Category--</option>
+                    @foreach (var item in Model.Category.Where(x => x.TypeOfCategory == Category.Type.Expenditure))
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+                <label class="control-label" for="subCategoryList" name="Subcategories">Sub-Category</label>
+                <select class="form-control text-center" id="subCategoryList" name="Subcategories">
+                    <option value="-1">--Select a Subcategory--</option>
+                    @foreach (var item in Model.Subcategory)
+                    {
+
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+                @Html.LabelFor(x => x.Transaction.TransationValue);
+                @Html.TextBoxFor(x => x.Transaction.TransationValue, new { @type = "text", @class = "form-control", @id = "value" })
+                @Html.ValidationMessageFor(x => x.Transaction.TransationValue)
+                <br />
+                <label class="control-label" for="subCategoryList" name="walletAndBanks">Wallet/Bank</label>
+                <select class="form-control text-center" id="walletAndBanks" name="walletAndBanks">
+                    <option value="-1">--Select a Bank or Wallet--</option>
+                    @foreach (var item in Model.WalletAndBanks)
+                    {
+
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>               
+                <label class="control-label">Comment</label>
+                <textarea id="transactionComment" rows="3" draggable="false" spellcheck="false" class="form-control text-justify" placeholder="Write Your Comments Here..."></textarea>
+                <br />               
+                <button name="saveNewRecord" class="btn btn-success" type="submit">Save</button>
+            }

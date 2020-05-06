@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "ListRecords";
+}
+
+<br />
+<div class="container" style="border:1px solid gray;border-radius:15px">
+    <h2>ListRecords</h2>
+    <div class="text-right">
+        <button class="btn" style="color:white;background-color:#0a63a3">Graphical View</button>
+        <button class="btn" style="color:white;background-color:#237527">Export File</button>
+    </div>
+    <hr />
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <td>
+                    <b style="color:#0094ff">Type</b><br />
+                    <select>
+                        <option>All</option>
+                        <option>Expenditure</option>
+                        <option>Income</option>
+                    </select>
+                </td>
+                <td>
+                    <b style="color:#0094ff">Category<br /></b>
+                    <select>
+                        <option>All</option>
+                        <option>Car</option>
+                    </select>
+                </td>
+                <td>
+                    <b style="color:#0094ff">
+                        Sub-Category
+                    </b><br />
+                    <select>
+                        <option>All</option>
+                        <option>Gas</option>
+                    </select>
+                </td>
+                <td>
+                    <b style="color:#0094ff">
+                        Date Settings
+                    </b><br />
+                    <select>
+                        <option>Transaction Date</option>
+                        <option>Adding Date</option>
+                    </select>
+                    <input class="text-center" type="date" placeholder="From" />&nbsp;<input class="text-center" type="date" placeholder="To" />
+                </td>
+                <td class="align-content-center align-middle">
+                    <b style="color:#0094ff">
+                        Value
+                    </b>
+                </td>
+                <td class="align-content-center align-middle">
+                    <b style="color:red">
+                        Delete
+                    </b>
+                </td>
+            </tr>
+        </thead>
+        <tr>
+            <td></td>
+        </tr>
+    </table>
+   
+</div>

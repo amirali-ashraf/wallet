@@ -1,0 +1,127 @@
+﻿
+@{
+    ViewBag.Title = "GroupsExpenditureList";
+}
+
+
+@{
+    ViewBag.Title = "Groups";
+}
+@using Wallet.Models.WalletModels
+@{
+    var SubCats = (List<Subcategory>)ViewBag.SubCats;
+
+}
+@{
+    var Cats = (List<Category>)ViewBag.Categories;
+
+}
+
+<br />
+<h1 style="margin:30px">Edit Categories & Sub-Categories</h1>
+<div class="container col-md-6 align-middle">
+    <button class="btn btn-success" style="margin-bottom:30px;font-weight:bold" data-toggle="modal" data-target="#exampleModalLong">+ Add Category</button>
+    <div id="accordion" role="tablist" aria-multiselectable="true">
+        @foreach (var item in Cats)
+        {
+            <div class="card">
+                <div class="card-header" role="tab" id="heading @item.Name">
+                    <b class="mb-0">
+                        @item.Name
+                    </b>
+                    <button class="btn btn-warning float-right collapsed" style="margin-left:10px" data-toggle="collapse" href="#collapse @item.Name" aria-expanded="false" aria-controls="collapse @item.Name">Expand</button>
+                    <button class="btn btn-success float-right"><span style="font-weight:bold">+</span>&nbsp;Add Sub-Category</button>
+                </div>
+
+                <div id="collapse @item.Name" class="collapse" role="tabpanel" aria-labelledby="heading @item.Name">
+                    <div class="card-block">
+                        <table class="table ">
+                            @foreach (var SubItem in SubCats.Where(x => x.Category.Id == item.Id))
+                            {
+                                <tr>
+                                    <td>
+                                        @SubItem.Name
+                                    </td>
+                                    <td><button class="btn btn-danger float-right">Delete</button></td>
+                                </tr>
+                            }
+
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+        @*--------------------------------------------------------------*@
+
+        <div class="card">
+            <div class="card-header" role="tab" id="headingTwo">
+                <b class="mb-0">
+                    Category 2
+                </b>
+                <button class="btn btn-warning float-right collapsed" style="margin-left:10px" data-toggle="collapse" @*data-parent="#accordion"*@ href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Expand</button>
+                <button class="btn btn-success float-right"><span style="font-weight:bold">+</span>&nbsp;Add Sub-Category</button>
+            </div>
+
+            <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
+                <div class="card-block">
+                    <table class="table ">
+                        <tr>
+                            <td>sub1</td>
+                            <td><button class="btn btn-danger float-right">Delete</button></td>
+                        </tr>
+                        <tr>
+                            <td>sub2</td>
+                            <td><button class="btn btn-danger float-right">Delete</button></td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+    Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#0094ff">
+                <h5 class="modal-title" id="exampleModalLongTitle" style="color:white">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-group">
+                    <label class="control-label">Name</label>
+                    <input class="form-control" />
+                    <label class="control-label">Choose a Color</label>
+                    <input type="color" class="form-control" style="width:50px;height:40px" />
+                    <br />
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+
+</script>

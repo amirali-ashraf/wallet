@@ -1,0 +1,84 @@
+﻿@using Wallet.Models.DBViewModels
+
+@model Wallet.Models.DBViewModels.CategoriesManagementViewModel
+
+
+<div>
+    <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+        <legend style="text-align: center">
+            Expenditures
+
+
+        </legend>
+
+        <button class="btn btn-link" id="add-category" category-type="Expenditure" type-id="2" category-id="-1">
+            <span class="fa fa-plus"></span> Add Category
+        </button>
+        <hr />
+        <div id="accordion" role="tablist" aria-multiselectable="true">
+            @foreach (var item in Model.ExpenditureCategories)
+            {
+                <div class="card">
+                    <div class="card-header" role="tab" id="heading @item.Name">
+                        <div class="table">
+                            <tr>
+                                <td>
+
+                                    <b class="float-left">
+                                        @item.Name
+                                    </b>
+
+                                </td>
+
+
+                                <td>
+                                    <br />
+                                    <button class="btn btn-link float-right collapsed" title="Expand the Category" style="margin-left: 10px" data-toggle="collapse" href="#collapse @item.Name" aria-expanded="false" aria-controls="collapse @item.Name">
+                                        <span class="fa fa-bars" style="color: orange"></span>
+                                    </button>
+
+                                    <button id="remove-category" class="btn btn-link float-right" style="margin-left: 10px" category-id="@item.Id" title="Remove the Category"><span class="fa fa-remove" style="font-weight: bold; color: red"></span></button>
+                                    <button id="edit-category" class="btn btn-link float-right" style="margin-left: 10px" category-id="@item.Id" title="Edit the Category" category-name="@item.Name" category-type="@item.TypeOfCategory"><span class="fa fa-edit" style="font-weight: bold; color: green"></span></button>
+
+                            </tr>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div id="collapse @item.Name" class="collapse" role="tabpanel" aria-labelledby="heading @item.Name">
+                        <div class="card-block">
+                            <div>
+                                <button class="btn btn-link" id="add-subcategory" type-name="Expenditure" category-name="@item.Name" category-id="@item.Id" subcategory-id="-1" style="margin-left: 10px" title="Add Subcategory"><span class="fa fa-plus">&nbsp;Add New Subcategory</span></button>
+
+                            </div>
+                            <div>
+                                @foreach (var subItem in Model.Subcategories.Where(x => x.Category.Id == item.Id))
+                                {
+                                    <ul>
+                                        <li style="list-style-type:none">
+                                            @subItem.Name
+
+                                            <button id="delete-subcategory" class="btn btn-link float-right" style="margin-left:10px" title="Remove the Category" subcategory-id="@subItem.Id"><span class="fa fa-remove" style="font-weight: bold;color:red"></span></button>
+                                            <button id="edit-subcategory" class="btn btn-link float-right" style="margin-left:10px" title="Edit the Category" type-name="Expenditure" category-name="@item.Name" subcategory-name="@subItem.Name" subcategory-id="@subItem.Id"><span class="fa fa-edit" style="font-weight: bold;color:green"></span></button>
+
+                                        </li>
+                                    </ul>
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </fieldset>
+</div>
+
+
+

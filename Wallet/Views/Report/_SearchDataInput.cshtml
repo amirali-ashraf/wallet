@@ -1,0 +1,63 @@
+﻿@using Microsoft.Ajax.Utilities
+@using Wallet.Models.DBViewModels
+@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.ReportViewModel
+@using Wallet.Models.WalletModels
+
+<fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+    <legend style="text-align: center">Search by Transaction Date</legend>
+    @*<label><input type="radio" name="optradio">Search by Transaction Date</label><br />
+    <label><input type="radio" name="optradio">Search by Adding Date</label>
+    <hr />*@
+    
+    
+
+    @*Transaction date control*@
+    @using (Html.BeginForm("ReportListByTransactionDate", "Report", FormMethod.Post))
+    {
+
+
+        @Html.ValidationSummary()
+
+        @Html.Label("FromDate", "From Date")
+        @Html.TextBoxFor(x => x.FromDate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", @id = "FromDate", @name = "FromDate" })
+        @Html.ValidationMessageFor(x => x.Transaction.TransactionDate)<br />
+
+
+
+
+
+        @Html.Label("ToDate", "To Date")
+        @Html.TextBoxFor(x => x.ToDate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", @id = "ToDate", @name = "ToDate" })
+        @Html.ValidationMessageFor(x => x.Transaction.TransactionDate)<br />
+
+
+
+
+
+        <label for="Types">Type</label>
+        <select id="Types" class="form-control" name="CategoryType">
+            <option value="">All Types</option>
+            <option value="@Category.Type.Income">Income</option>
+            <option value="@Category.Type.Expenditure">Expenditure</option>
+        </select><br />
+
+        <label for="Categories">Categories</label>
+        <select class="form-control" id="Categories" name="CategoryId"></select>
+
+        
+        <br />
+        <label for="Subcategories">Subcategories</label>
+        <select class="form-control" id="Subcategories" name="SubcategoryId"></select>
+
+
+        @Html.AntiForgeryToken()
+        <button id="Report" value="Search" style="margin-top: 10px" class="btn btn-primary">Reporting</button>
+
+
+        <br />
+
+
+    }
+
+</fieldset>

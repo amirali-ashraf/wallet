@@ -1,0 +1,50 @@
+﻿@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.AddRecordViewModel
+
+
+@if (Model.Transactions.Count > 0)
+{
+    <table id="TodayTransactions" class="table table-bordered table-hover table-striped table-responsive-md">
+        <thead>
+            <tr class="text-center" style="background-color:#0094ff">
+                <th>Row</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th>Transaction Value</th>
+                <th>Delete Item</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var item in Model.Transactions)
+            {
+                <tr id="@item.Id">
+                    <td>@(i++)</td>
+                    <td>@item.Category.TypeOfCategory</td>
+                    <td>@item.Category.Name</td>
+                    <td>@item.Subcategory.Name</td>
+                    @if (item.Category.TypeOfCategory == Category.Type.Income)
+                    {
+                        <td style="color:green"><span class="fa fa-arrow-circle-o-up"></span>@item.TransationValue.ToString("0,0")</td>
+                    }
+                    else if (item.Category.TypeOfCategory == Category.Type.Expenditure)
+                    {
+                        <td style="color:orangered"><span class="fa fa-arrow-circle-o-down"></span>@item.TransationValue.ToString("0,0")</td>
+
+                    }
+                    <td>
+                        <button name="deleteTransaction" id="@item.Id" class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.Transactions.Count == 0)
+{
+    <h2 class="text-center" style="color:#ff0000">No Data is Available to Preview</h2>
+}
+

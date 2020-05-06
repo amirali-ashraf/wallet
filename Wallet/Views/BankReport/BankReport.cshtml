@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewBag.Title = "BankReport";
+}
+
+<br />
+<h2>Reports on Banks and Wallet</h2>
+@model Wallet.Models.DBViewModels.BankReportViewModel
+
+
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Search Field</legend>
+                @Html.Partial("_SearchInputBankReport")
+            </fieldset>
+
+        </div>
+        <div class="col-md-8">
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Numerical Bank Report</legend>
+                @Html.Partial("_NumericalBankReport")
+            </fieldset>
+
+            <fieldset class="border" style="border-color: gray; padding: 10px; border-radius: 15px; margin: 5px">
+                <legend style="text-align: center">Table View Report</legend>
+                @Html.Partial("_ResultTableBankReport")
+            </fieldset>
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+
+    <script>
+
+
+
+        $("td").hover(function () {
+            //todo: add a window to show the information of the transaction in hover a row!!!
+        });
+    </script>
+
+}
+
+
+
+
+

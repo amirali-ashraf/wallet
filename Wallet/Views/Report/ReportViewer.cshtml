@@ -1,0 +1,446 @@
+﻿@using Wallet.Models.DBViewModels
+@using Wallet.Models.WalletModels
+@model Wallet.Models.DBViewModels.ReportViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+
+
+<div class="container">
+    <br />
+    <h2>Report</h2><br />
+
+    <div class="row">
+        <div class="col-4">
+
+            @Html.Partial("_ReportViewerDataInput")
+            <br />
+
+        </div>
+
+        <div class="col-8">
+            @Html.Partial("_NumericalAndChartField", Model)
+            <br />
+
+            @Html.Partial("_ReportViewerList")
+        </div>
+
+    </div>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <strong style="background-color:lightcoral"></strong>
+</div>
+
+
+
+<script>
+    //REMEMBER TO MAKE THE JAVASCRIPT CODES CLEAN IN THE NEXT STEP
+    var myTable;
+
+
+    // the method to delete the data from the list.
+    $("table").on("click",
+        ".delete-js",
+        function() {
+            var deleteButton = $(this);
+            bootbox.confirm({
+                message: "Are you sure to delete this transaction?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function(result) {
+                    alert(result);
+                    if (result) {
+
+                        $.ajax({
+                                url: "/api/Transaction/" + deleteButton.attr("data-transaction-id"),
+                                method: "DELETE"
+                            })
+                            .done(function() {
+                                bootbox.alert("The Transaction is Deleted!");
+                                //todo: add the code to delete the row of the deleted transaction
+                            })
+                            .fail(function () {
+                                bootbox.alert("Somthing Fail to Delete the transaction");
+                            });
+
+                    }
+
+
+                }
+            });
+        });
+
+
+
+
+
+    // the method to make a report from the data
+    $("button[id='Reporting']").on("click",
+        function(event) {
+            event.preventDefault();
+            if ($("#Types").val() === "") {
+                $.ajax(
+                    {
+                        url: "/api/ReportsByTransactionDate",
+                        method: "GET",
+                        data: {
+                            from: $("#FromDate").val(),
+                            to: $("#ToDate").val()
+                        },
+                        success: function (data) {
+                            TableRendering(data);
+                        }
+
+                    });
+            }
+            else if ($("#Categories").val() == "") {
+                $.ajax(
+                    {
+                        url: "/api/ReportsByTransactionDate",
+                        method: "GET",
+                        data: {
+                            from: $("#FromDate").val(),
+                            to: $("#ToDate").val(),
+                            type: $("#Types").val()
+                        },
+                        success: function (data) {
+                            TableRendering(data);
+                        }
+
+                    });
+            }
+            else if ($("#Subcategories").val() == "") {
+                $.ajax(
+                    {
+                        url: "/api/ReportsByTransactionDate",
+                        method: "GET",
+                        data: {
+                            from: $("#FromDate").val(),
+                            to: $("#ToDate").val(),
+                            type: $("#Types").val(),
+                            CategoryId: $("#Categories").val()
+                        },
+                        success: function (data) {
+                            TableRendering(data);
+                        }
+
+                    });
+
+            } else {
+
+
+                $.ajax(
+                    {
+                        url: "/api/ReportsByTransactionDate",
+                        method: "GET",
+                        data: {
+                            from: $("#FromDate").val(),
+                            to: $("#ToDate").val(),
+                            type: $("#Types").val(),
+                            CategoryId: $("#Categories").val(),
+                            SubcategoryId: $("#Subcategories").val()
+                        },
+                        success: function (data) {
+                            TableRendering(data);
+                        }
+
+                    });
+            };
+        });
+
+
+    //data adding to the table by rendering all data
+    function TableRendering(data) {
+        //$("#ReportList > tbody").empty();
+        //$.each(data,
+        //    function(val, data) {
+
+        //        $("#ReportList > tbody").append(
+        //            "<tr" + (data.CategoryTypeOfCategory == "Expenditure" ? " style='background-color:#f3d4d5'>" : " style='background-color:#d5f3d4'>")  +
+        //            "<td>" + (val+1) + "</td>" +
+        //            "<td>" + data.CategoryName + "</td>" +
+        //            "<td>" + data.SubcategoryName + "</td>" +
+        //            "<td>" + numeral(data.TransationValue).format('0,0') + "</td>" +
+        //            "<td>" +
+        //            (data.Comment == null ? '<p style="color:darkred">No Comment<p>' : '<button class="btn btn-link bb-comment" id="Comment" value="' + data.Comment + '">Comment</button>')
+        //            + "</td>" +
+        //            "<td>" + moment(data.TransactionDate).format("d MMM YYYY") + "</td>" +
+        //            "<td>" + "<button class='btn btn-link delete-js' data-transaction-id = '" + data.Id + "'>Delete</button>" +
+        //            "<button class='btn btn-link edit-js' data-transaction-id='" + data.Id + "'>Edit</button>" + "</td>" +
+        //            "</tr>");
+        //    });
+        //myTable = $('#ReportList').DataTable();
+
+
+
+
+
+        
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
+
+    $("table").delegate('button.bb-comment','click',
+        function (event) {
+            var comment = $(this).val();
+
+            bootbox.alert("<h3 style='color:darkblue;'>Comment:</h3> <br>"+comment);
+        });
+
+    $(document).ready(function () {
+
+
+        $("#Categories").prop("disabled", true); //diables the Categories in the beginning
+        $("#Subcategories").prop("disabled", true); //diables the Subcategories in the beginning
+        $("#Types").val(""); //set the value of the type in the beginning
+
+
+
+        //Control the Type's changes in the form and make Categories and Subcategries disable
+        $("select[id='Types']").on("click",
+            function () {
+                $("#Categories").empty();
+                $("#Subcategories").empty();
+                if ($("#Types option:selected").val() === "") {
+                    $("#Categories").prop("disabled", true);
+                    $("#Subcategories").prop("disabled", true);
+                } else {
+                    var selectedType = $("#Types").val();
+
+                    $("#Categories").prop("disabled", false);
+
+                    if (selectedType == "@Category.Type.Income") {
+                        //recieves the data which have the 1=Income value and returns the list of relevant category
+                        var incomeModel = @Html.Raw(Json.Encode(Model.Categories.Where(x=>x.TypeOfCategory == Category.Type.Income).Select(x => new {x.Id,x.Name,x.TypeOfCategory}).ToList()));
+                        $("#Categories").append("<option value=''>All Categories</option>");
+                        $.each(incomeModel,
+                            function (key, value) {
+                                $("#Categories").append("<option value='" + value.Id + "'>" + value.Name + "</option>");
+                            });
+                    }
+                    else if (selectedType == "@Category.Type.Expenditure") {
+                        //recieves the data which have the 2=expenditure value and returns the list of relevant category
+                        var expenditureModel = @Html.Raw(Json.Encode(Model.Categories.Where(x=>x.TypeOfCategory==Category.Type.Expenditure).Select(x => new {x.Id,x.Name,x.TypeOfCategory}).ToList()));
+                        $("#Categories").append("<option value=''>All Categories</option>");
+                        $.each(expenditureModel,
+                            function (key, value) {
+                                $("#Categories").append("<option value='" + value.Id + "'>" + value.Name + "</option>");
+                            });
+                    }
+                    if ($("#Categories option:selected").val() == "") {
+                        $("#Subcategories").prop("disabled", true);
+                    } else {
+                        $("#Subcategories").prop("disabled", false);
+                    }
+
+                }
+            });
+
+
+        //Control the subategories by changing the categories
+
+        $("select[id='Categories']").on("click",
+            function () {
+                //this function recieves the value of each of the categories and seive the values with the same idea as selected.
+                var categoryId = $("#Categories").val();
+                var subcategoryModel = @Html.Raw(Json.Encode(Model.Subcategories.Select(x => new {x.Id, x.Name, CatId =(int) x.Category.Id}).ToList()));
+                $("#Subcategories").empty();
+                if ($("#Categories option:selected").val() == "") {
+                    $("#Subcategories").prop("disabled", true);
+                } else {
+                    $("#Subcategories").prop("disabled", false);
+                    $("#Subcategories").append("<option value=''>All Subcategories</option>");
+                    $.each(subcategoryModel,
+                        function (key, value) {
+                            if (value.CatId == categoryId) {
+
+                                $("#Subcategories").append("<option value='" + value.Id + "'>" + value.Name + "</option>");
+                            }
+
+                        });
+                }
+
+
+            });
+
+    });
+
+
+
+    $(document).ready(function() {
+        var dataTransactionValues = [];
+        var dataTransactionCategory = [];
+
+
+        @foreach (var value in Model.Transactions.GroupBy(t=>t.Category.TypeOfCategory)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataTransactionValues.push(parseInt("@value.Value"));
+                @:dataTransactionCategory.push("@value.CategoryType");
+
+            }
+         //chartsssssss
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+
+
+
+            var dataIncomeTransactionValues = [];
+            var dataIncomeTransactionCategory = [];
+
+
+            var incomeChartDraw = document.getElementById("incomeChart").getContext('2d');
+            @foreach (var value in Model.Transactions.Where(t => t.Category.TypeOfCategory == Category.Type.Income)
+                                                     .GroupBy(t=>t.Category)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataIncomeTransactionValues.push(parseInt("@value.Value"));
+                @:dataIncomeTransactionCategory.push("@value.Name");
+
+            }
+            var incomeChart = new Chart(incomeChartDraw,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataIncomeTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataIncomeTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+
+
+
+            var dataExpenditureTransactionValues = [];
+            var dataExpenditureTransactionCategory = [];
+
+            var expenditureChartDraw = document.getElementById("expenditureChart").getContext('2d');
+            @foreach (var value in Model.Transactions.Where(t => t.Category.TypeOfCategory == Category.Type.Expenditure)
+                                                     .GroupBy(t=>t.Category)
+                                                     .Select(g=>new
+                                                     {
+                                                         Key=g.Key,
+                                                         Value = g.Sum(s=>s.TransationValue),
+                                                         Name = g.First().Category.Name,
+                                                         CategoryType = g.First().Category.TypeOfCategory
+                                                     }).ToList())
+            {
+                @:dataExpenditureTransactionValues.push(parseInt("@value.Value"));
+                @:dataExpenditureTransactionCategory.push("@value.Name");
+
+            }
+            var expenditureChart = new Chart(expenditureChartDraw,
+                {
+                    type: 'pie',
+                    data: {
+                        labels: dataExpenditureTransactionCategory,
+                        datasets: [
+                            {
+                                label: '# of Votes',
+                                data: dataExpenditureTransactionValues,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    }
+
+                });
+    });
+
+
+</script>
+
+@*@section scripts{
+
+    }*@
